@@ -6,11 +6,11 @@ const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*
 
 const UsersService = {
 	getUserById(knex, id) {
-		return knex.from('rk_users').select('*').where('id', id).first();
+		return knex.from('nt_users').select('*').where('id', id).first();
 	},
 
 	hasUserWithUserName(db, user_name, email) {
-		return db('rk_users')
+		return db('nt_users')
 			.where({ user_name })
 			.orWhere({ email })
 			.first()
@@ -19,7 +19,7 @@ const UsersService = {
 	insertUser(db, newUser) {
 		return db
 			.insert(newUser)
-			.into('rk_users')
+			.into('nt_users')
 			.returning('*')
 			.then(([user]) => user);
 	},

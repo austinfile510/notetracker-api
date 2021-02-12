@@ -19,9 +19,9 @@ This API runs at the following endpoints:
 /users - Used to POST new users to the database.
 /auth/login - Used to POST login requests
 
-/to-do-lists - GET request, retrieves all users' to do lists. Users can switch between them freely after login.
-/to-do-lists/:to-doId - GET, lists tasks from a specific to-do list. 
-/tasks GET all tasks from all lists
+/to-do-lists - GET, retrieves all users' to-do lists. Users can switch between the lists freely after login. By default, will render tasks from all lists on login.
+/to-do-lists/:listId - GET, lists tasks from a specific to-do list. 
+/tasks GET all tasks from all lists. By default, will render tasks from all lists on login.
 /tasks/:taskId GET, POST, and DELETE a specific task. Tasks can be viewed in more detail, change from complete or incomplete, and be deleted by the user.
 
 

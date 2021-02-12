@@ -4,5 +4,6 @@ CREATE TABLE tasks (
     content TEXT NOT NULL,
     is_checked BOOLEAN DEFAULT false,
     modified TIMESTAMPTZ DEFAULT now() NOT NULL,
-    list_id INTEGER REFERENCES to_do_lists(id) ON DELETE CASCADE NOT NULL
+    list_id INTEGER REFERENCES to_do_lists(id) ON DELETE CASCADE NOT NULL,
+    user_id INTEGER REFERENCES nt_users(id) ON DELETE CASCADE NOT NULL
 );
