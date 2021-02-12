@@ -10,7 +10,6 @@ const usersRouter = require('./users/users-router');
 const listsRouter = require('./to-do-lists/to-do-lists-router');
 const tasksRouter = require('./tasks/tasks-router');
 
-
 const app = express();
 
 const morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';

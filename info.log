@@ -42,3 +42,278 @@
 {"message":"TasksService.getById is not a function","level":"error"}
 {"message":"TasksService.getById is not a function","level":"error"}
 {"message":"TasksService.getById is not a function","level":"error"}
+{"message":"Unexpected token } in JSON at position 64","level":"error"}
+{"message":"task_id is required","level":"error"}
+{"message":"task_id is required","level":"error"}
+{"message":"folder_id is not defined","level":"error"}
+{"message":"insert into \"tasks\" (\"content\", \"list_id\", \"title\") values ($1, $2, $3) returning * - insert or update on table \"tasks\" violates foreign key constraint \"tasks_list_id_fkey\"","level":"error"}
+{"message":"list_name is required","level":"error"}
+{"message":"insert into \"to_do_lists\" (\"list_name\") values ($1) returning * - null value in column \"user_id\" of relation \"to_do_lists\" violates not-null constraint","level":"error"}
+{"message":"list is not defined","level":"error"}
+{"message":"list is not defined","level":"error"}
+{"message":"list is not defined","level":"error"}
+{"message":"list is not defined","level":"error"}
+{"message":"list is not defined","level":"error"}
+{"message":"list is not defined","level":"error"}
+{"message":"list is not defined","level":"error"}
+{"message":"insert into \"to_do_lists\" (\"list_name\", \"user_id\") values ($1, DEFAULT) returning * - null value in column \"user_id\" of relation \"to_do_lists\" violates not-null constraint","level":"error"}
+{"message":"List with id 3 created.","level":"info"}
+{"message":"ToDoListsService.getById is not a function","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Cannot read property 'then' of undefined","level":"error"}
+{"message":"Cannot read property 'then' of undefined","level":"error"}
+{"message":"Cannot read property 'then' of undefined","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling SELECT. Undefined column(s): [user_id] query: select * from \"tasks\" where \"user_id\" = ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling SELECT. Undefined column(s): [user_id] query: select * from \"tasks\" where \"user_id\" = ?","level":"error"}
+{"message":"title is required","level":"error"}
+{"message":"Unexpected token } in JSON at position 34","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"insert into \"tasks\" (\"content\", \"is_checked\", \"list_id\", \"title\") values ($1, $2, $3, $4) returning * - null value in column \"user_id\" of relation \"tasks\" violates not-null constraint","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling FIRST. Undefined column(s): [id] query: select * from \"to_do_lists\" where \"id\" = ? limit ?","level":"error"}
+{"message":"List with id 1 deleted.","level":"info"}
+{"message":"List with id 2 created.","level":"info"}
+{"message":"Undefined binding(s) detected when compiling SELECT. Undefined column(s): [user_id] query: select * from \"tasks\" where \"user_id\" = ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling SELECT. Undefined column(s): [user_id] query: select * from \"tasks\" where \"user_id\" = ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling SELECT. Undefined column(s): [user_id] query: select * from \"tasks\" where \"user_id\" = ?","level":"error"}
+{"message":"Undefined binding(s) detected when compiling SELECT. Undefined column(s): [user_id] query: select * from \"tasks\" where \"user_id\" = ?","level":"error"}
+{"message":"insert into \"tasks\" (\"content\", \"is_checked\", \"list_id\", \"title\") values ($1, $2, $3, $4) returning * - null value in column \"user_id\" of relation \"tasks\" violates not-null constraint","level":"error"}
+{"message":"insert into \"tasks\" (\"content\", \"is_checked\", \"list_id\", \"title\") values ($1, $2, $3, $4) returning * - null value in column \"user_id\" of relation \"tasks\" violates not-null constraint","level":"error"}
+{"message":"List with id 3 created.","level":"info"}
+{"message":"List with id 3 deleted.","level":"info"}
+{"message":"List with id 4 created.","level":"info"}
+{"message":"insert into \"tasks\" (\"content\", \"is_checked\", \"list_id\", \"title\") values ($1, $2, $3, $4) returning * - null value in column \"user_id\" of relation \"tasks\" violates not-null constraint","level":"error"}
+{"message":"task with id 5 created.","level":"info"}
+{"message":"task with id 5 deleted.","level":"info"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"select * from \"tasks\" where \"user_id\" = $1 - column \"user_id\" does not exist","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"is_checked is not defined","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"user_id is not defined","level":"error"}
+{"message":"user_id is not defined","level":"error"}
+{"message":"user_id is not defined","level":"error"}
+{"message":"user_id is not defined","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"user_id is not defined","level":"error"}
+{"message":"user_id is not defined","level":"error"}
+{"message":"user_id is not defined","level":"error"}
+{"message":"user_id is not defined","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"is_checked is required","level":"error"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"is_checked is required","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"is_checked is required","level":"error"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"is_checked is required","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"currentUser is not defined","level":"error"}
+{"message":"list_name is required","level":"error"}
+{"message":"currentUser is not defined","level":"error"}
+{"message":"list_name is required","level":"error"}
+{"message":"currentUser is not defined","level":"error"}
+{"message":"list_name is required","level":"error"}
+{"message":"currentUser is not defined","level":"error"}
+{"message":"list_name is required","level":"error"}
+{"message":"currentUser is not defined","level":"error"}
+{"message":"list_name is required","level":"error"}
+{"message":"currentUser is not defined","level":"error"}
+{"message":"list_name is required","level":"error"}
+{"message":"currentUser is not defined","level":"error"}
+{"message":"list_name is required","level":"error"}
+{"message":"currentUser is not defined","level":"error"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 2 deleted.","level":"info"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 2 deleted.","level":"info"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 2 deleted.","level":"info"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 2 deleted.","level":"info"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"List with id 2 deleted.","level":"info"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"List with id 2 deleted.","level":"info"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"List with id 2 deleted.","level":"info"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"List with id 5 created.","level":"info"}
+{"message":"Task with id 6 created.","level":"info"}
+{"message":"task with id 6 deleted.","level":"info"}

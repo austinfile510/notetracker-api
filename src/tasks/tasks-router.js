@@ -12,25 +12,29 @@ const serializeTask = (task) => ({
 	id: task.id,
 	title: xss(task.title),
 	content: xss(task.content),
+	is_checked: task.is_checked,
 	modified: task.modified,
 	list_id: task.list_id,
+	user_id: task.user_id,
 });
 
 // Tasks Route
 
 tasksRouter
 	.route('/')
+	.all(requireAuth)
 	.get((req, res, next) => {
+		const currentUser = req.user.id;
 		const knexInstance = req.app.get('db');
-		TasksService.getAllTasks(knexInstance)
+		TasksService.getAllTasks(knexInstance, currentUser)
 			.then((tasks) => {
 				res.json(tasks.map(serializeTask));
 			})
 			.catch(next);
 	})
-	.post(jsonParser, (req, res, next) => {
-		const { title, content, task_id, modified } = req.body;
-		const newTask = { title, content, task_id };
+	.post(requireAuth, jsonParser, (req, res, next) => {
+		const { title, content, list_id, } = req.body;
+		const newTask = { title, content, list_id };
 
 		for (const [key, value] of Object.entries(newTask)) {
 			if (!value) {
@@ -40,16 +44,14 @@ tasksRouter
 				});
 			}
 		}
-
-		newTask.title = title;
-		newTask.content = content;
-		newTask.folder_id = folder_id;
-		// newTask.modified = modified;
+		
+		newTask.user_id = req.user.id;
+		newTask.is_checked = false;
 		const knexInstance = req.app.get('db');
 
 		TasksService.insertTask(knexInstance, newTask)
 			.then((task) => {
-				logger.info(`task with id ${task.id} created.`);
+				logger.info(`Task with id ${task.id} created.`);
 				res
 					.status(201)
 					.location(path.posix.join(req.originalUrl + `/${task.id}`))
@@ -64,11 +66,11 @@ tasksRouter
 	.route('/:task_id')
 	.all((req, res, next) => {
 		const knexInstance = req.app.get('db');
-		TasksService.getById(knexInstance, req.params.task_id)
+		TasksService.getTaskById(knexInstance, req.params.task_id)
 			.then((task) => {
 				if (!task) {
 					return res.status(404).json({
-						error: { message: `task doesn't exist` },
+						error: { message: `Task doesn't exist` },
 					});
 				}
 				res.task = task;
@@ -93,17 +95,15 @@ tasksRouter
 	})
 
 	.patch(jsonParser, (req, res, next) => {
-		const { title, content, folder_id } = req.body;
-		const taskToUpdate = { title, content, folder_id };
-
-		console.log(taskToUpdate);
+		const { title, content, list_id } = req.body;
+		const taskToUpdate = { title, content, list_id };
 
 		const numberOfValues = Object.values(taskToUpdate).filter(Boolean).length;
 		if (numberOfValues === 0) {
 			logger.error(`Invalid update without required fields`);
 			return res.status(400).json({
 				error: {
-					message: `Request body must content either 'title', 'content' or 'folder_id'`,
+					message: `Request body must content either 'title', 'content' or 'list_id'`,
 				},
 			});
 		}

@@ -11,6 +11,7 @@ const jsonParser = express.json();
 const serializeList = (list) => ({
 	id: list.id,
 	list_name: xss(list.list_name),
+	user_id: list.user_id,
 });
 
 // Lists Route
@@ -19,14 +20,15 @@ listsRouter
 	.route('/')
 	.all(requireAuth)
 	.get((req, res, next) => {
+		const currentUser = req.user.id;
 		const knexInstance = req.app.get('db');
-		ToDoListsService.getAllLists(knexInstance)
+		ToDoListsService.getAllLists(knexInstance, currentUser)
 			.then((lists) => {
 				res.json(lists.map(serializeList));
 			})
 			.catch(next);
 	})
-	.post(jsonParser, (req, res, next) => {
+	.post(requireAuth, jsonParser, (req, res, next) => {
 		const { list_name } = req.body;
 		const newList = { list_name };
 
@@ -39,7 +41,7 @@ listsRouter
 			}
 		}
 
-		newList.list_name = list_name;
+		newList.user_id = req.user.id;
 
 		const knexInstance = req.app.get('db');
 
@@ -58,9 +60,10 @@ listsRouter
 
 listsRouter
 	.route('/:list_id')
+	.all(requireAuth)
 	.all((req, res, next) => {
 		const knexInstance = req.app.get('db');
-		ToDoListsService.getById(knexInstance, req.params.list_id)
+		ToDoListsService.getListById(knexInstance, req.params.list_id)
 			.then((list) => {
 				if (!list) {
 					return res.status(404).json({
@@ -82,7 +85,6 @@ listsRouter
 		const { list_id } = req.params;
 		ToDoListsService.deleteList(knexInstance, req.params.list_id)
 			.then((numRowsAffected) => {
-				numRowsAffected = list_id;
 				logger.info(`List with id ${list_id} deleted.`);
 				res.status(204).end();
 			})
@@ -104,11 +106,7 @@ listsRouter
 		}
 
 		const knexInstance = req.app.get('db');
-		ToDoListsService.updateList(
-			knexInstance,
-			req.params.list_id,
-			listToUpdate
-		)
+		ToDoListsService.updateList(knexInstance, req.params.list_id, listToUpdate)
 			.then((numRowsAffected) => {
 				res.status(204).end();
 			})

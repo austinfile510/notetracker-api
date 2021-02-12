@@ -1,6 +1,9 @@
+const knex = require('knex');
+const xss = require('xss');
+
 const TasksService = {
-    getAllTasks(knex) {
-        return knex.select('*').from('tasks')
+    getAllTasks(knex, user_id) {
+        return knex.select('*').from('tasks').where('user_id', user_id);
     },
     getTaskById(knex, id) {
         return knex.from('tasks').select('*').where('id', id).first();

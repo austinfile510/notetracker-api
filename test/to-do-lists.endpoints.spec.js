@@ -1,9 +1,8 @@
 const knex = require('knex');
-const { makeListsArray, makeMaliciousList } = require('./test-helpers');
 const app = require('../src/app');
-const { addColors } = require('winston/lib/winston/config');
 const supertest = require('supertest');
 const { expect } = require('chai');
+const helpers = require('./test-helpers');
 
 describe('Lists Endpoints', function () {
 	let db;
@@ -21,157 +20,112 @@ describe('Lists Endpoints', function () {
 	before('cleanup', () => helpers.cleanTables(db));
 
 	afterEach('cleanup', () => helpers.cleanTables(db));
-	
-
-	// Unauthorized Requests
-
-	describe(`Unauthorized requests`, () => {
-		const testLists = makeListsArray();
-
-		beforeEach('insert lists', () => {
-			return db.into('to_do_lists').insert(testLists);
-		});
-
-		it(`responds with 401 Unauthorized for GET /api/lists`, () => {
-			return supertest(app)
-				.get('/api/lists')
-				.expect(401, { error: 'Unauthorized request' });
-		});
-
-		it(`responds with 401 Unauthorized for POST /api/lists`, () => {
-			return supertest(app)
-				.post('/api/lists')
-				.send({ list_name: 'Something' })
-				.expect(401, { error: 'Unauthorized request' });
-		});
-
-		it(`responds with 401 Unauthorized for GET /api/lists/:id`, () => {
-			const secondList = testLists[1];
-			return supertest(app)
-				.get(`/api/lists/${secondList.id}`)
-				.expect(401, { error: 'Unauthorized request' });
-		});
-
-		it(`responds with 401 Unauthorized for DELETE /api/lists/:id`, () => {
-			const alist = testlists[1];
-			return supertest(app)
-				.delete(`/api/lists/${alist.id}`)
-				.expect(401, { error: 'Unauthorized request' });
-		});
-
-		it(`responds with 401 Unauthorized for PATCH /api/lists/:id`, () => {
-			const alist = testlists[1];
-			return supertest(app)
-				.patch(`/api/lists/${alist.id}`)
-				.send({ title: 'updated-title' })
-				.expect(401, { error: 'Unauthorized request' });
-		});
-	});
 
 	// GET Requests
 
 	// GET all lists
-	describe(`GET /api/lists`, () => {
+	describe(`GET /api/to-do-lists`, () => {
+		const testUsers = helpers.makeUsersArray();
+
+		beforeEach('insert users', () => {
+			return db.into('nt_users').insert(testUsers);
+		});
+
 		context(`Given no lists`, () => {
 			it(`responds with 200 and an empty list`, () => {
 				return supertest(app)
-					.get('/api/lists')
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+					.get('/api/to-do-lists')
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 					.expect(200, []);
 			});
 		});
 
 		context('Given there are lists in the database', () => {
-			const testLists = makeListsArray();
+			const testTasks = helpers.makeTasksArray();
+			const testLists = helpers.makeListsArray();
 
-			beforeEach('insert lists', () => {
-				return db.into('to_do_lists').insert(testLists);
+			beforeEach('insert tasks', () => {
+				return db
+					.into('to_do_lists')
+					.insert(testLists)
+					.then(() => {
+						return db.into('tasks').insert(testTasks);
+					});
 			});
 
 			it('responds with 200 and all the lists', () => {
 				return supertest(app)
-					.get('/api/lists')
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+					.get('/api/to-do-lists')
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 					.expect(200, testLists);
-			});
-		});
-
-		context(`Given an XSS attack list`, () => {
-			const { maliciousList, expectedList } = makeMaliciousList();
-
-			beforeEach('insert malicious list', () => {
-				return db.into('to_do_lists').insert([maliciousList]);
-			});
-
-			it('removes XSS attack content', () => {
-				return supertest(app)
-					.get(`/api/lists`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(200)
-					.expect((res) => {
-						expect(res.body[0].list_name).to.eql(expectedList.list_name);
-					});
 			});
 		});
 	});
 
 	// GET list by id
 
-	describe(`GET /api/lists/:list_id`, () => {
+	describe(`GET /api/to-do-lists/:list_id`, () => {
 		context(`Given no lists`, () => {
+			const testUsers = helpers.makeUsersArray();
+
+			beforeEach('insert users', () => {
+				return db.into('nt_users').insert(testUsers);
+			});
+
 			it(`responds with 404`, () => {
 				const fakeListId = 123456;
 				return supertest(app)
-					.get(`/api/lists/${fakeListId}`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(404, { error: { message: `list doesn't exist` } });
+					.get(`/api/to-do-lists/${fakeListId}`)
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
+					.expect(404, { error: { message: `List doesn't exist` } });
 			});
 		});
 
 		context(`Given there are lists in the database`, () => {
-			const testLists = makeListsArray();
+			const testTasks = helpers.makeTasksArray();
+			const testLists = helpers.makeListsArray();
+			const testUsers = helpers.makeUsersArray();
 
-			beforeEach('insert lists', () => {
-				return db.into('to_do_lists').insert(testLists);
+			beforeEach('insert tasks', () => {
+				return db
+					.into('nt_users')
+					.insert(testUsers)
+					.then(() => {
+						return db
+							.into('to_do_lists')
+							.insert(testLists)
+							.then(() => {
+								return db.into('tasks').insert(testTasks);
+							});
+					});
 			});
 
 			it(`responds with 200 and the specified list`, () => {
-				const listId = 2;
+				const testUsers = helpers.makeUsersArray();
+				const listId = 3;
 				const expectedList = testLists[listId - 1];
 				return supertest(app)
-					.get(`/api/lists/${listId}`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+					.get(`/api/to-do-lists/${listId}`)
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 					.expect(200, expectedList);
-			});
-		});
-
-		context(`Given an XSS attack list`, () => {
-			const { maliciousList, expectedList } = makeMaliciousList();
-
-			beforeEach('insert malicious list', () => {
-				return db.into('to_do_lists').insert([maliciousList]);
-			});
-
-			it('removes XSS attack content', () => {
-				return supertest(app)
-					.get(`/api/lists`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(200)
-					.expect((res) => {
-						expect(res.body[0].list_name).to.eql(expectedList.list_name);
-					});
 			});
 		});
 	});
 
 	// Delete list
 
-	describe(`DELETE /api/lists:id`, () => {
+	describe(`DELETE /api/to-do-lists/:list_id`, () => {
 		context(`Given no lists`, () => {
-			it(`responds with 404 when list doesn't exist`, () => {
+			const testUsers = helpers.makeUsersArray();
+
+			beforeEach('insert users', () => {
+				return db.into('nt_users').insert(testUsers);
+			});
+
+			it(`responds with 404 when List doesn't exist`, () => {
 				return supertest(app)
-					.delete(`/api/lists/123`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+					.delete(`/api/to-do-lists/123`)
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 					.expect(404, {
 						error: { message: `List doesn't exist` },
 					});
@@ -179,23 +133,34 @@ describe('Lists Endpoints', function () {
 		});
 
 		context(`Given there are lists in the database`, () => {
-			const testLists = makeListsArray();
+			const testTasks = helpers.makeTasksArray();
+			const testLists = helpers.makeListsArray();
+			const testUsers = helpers.makeUsersArray();
 
-			beforeEach('insert lists', () => {
-				return db.into('to_do_lists').insert(testLists);
+			beforeEach('insert tasks', () => {
+				return db
+					.into('nt_users')
+					.insert(testUsers)
+					.then(() => {
+						return db
+							.into('to_do_lists')
+							.insert(testLists)
+							.then(() => {
+								return db.into('tasks').insert(testTasks);
+							});
+					});
 			});
-
 			it(`removes the list by ID from the database`, () => {
 				const idToRemove = 2;
 				const expectedList = testLists.filter((fr) => fr.id !== idToRemove);
 				return supertest(app)
-					.delete(`/api/lists/${idToRemove}`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+					.delete(`/api/to-do-lists/${idToRemove}`)
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 					.expect(204)
 					.then(() =>
 						supertest(app)
-							.get(`/api/lists`)
-							.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+							.get(`/api/to-do-lists`)
+							.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 							.expect(expectedList)
 					);
 			});
@@ -204,10 +169,11 @@ describe('Lists Endpoints', function () {
 
 	// Insert list
 
-	describe(`POST /api/lists`, () => {
-		const testLists = makeListsArray();
-		beforeEach('insert lists', () => {
-			// return db.into('to_do_lists').insert(testLists);
+	describe(`POST /api/to-do-lists`, () => {
+		const testUsers = helpers.makeUsersArray();
+
+		beforeEach('insert users', () => {
+			return db.into('nt_users').insert(testUsers);
 		});
 
 		it(`adds a new list to the database`, () => {
@@ -215,18 +181,20 @@ describe('Lists Endpoints', function () {
 				list_name: 'test-name',
 			};
 			return supertest(app)
-				.post(`/api/lists`)
+				.post(`/api/to-do-lists`)
 				.send(newList)
-				.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+				.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 				.expect(201)
 				.expect((res) => {
 					expect(res.body.list_name).to.eql(newList.list_name);
-					expect(res.headers.location).to.eql(`/api/lists/${res.body.id}`);
+					expect(res.headers.location).to.eql(
+						`/api/to-do-lists/${res.body.id}`
+					);
 				})
 				.then((res) =>
 					supertest(app)
-						.get(`/api/lists/${res.body.id}`)
-						.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+						.get(`/api/to-do-lists/${res.body.id}`)
+						.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 						.expect(res.body)
 				);
 		});
@@ -242,44 +210,38 @@ describe('Lists Endpoints', function () {
 				delete newList[field];
 
 				return supertest(app)
-					.post(`/api/lists`)
+					.post(`/api/to-do-lists`)
 					.send(newList)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 					.expect(400, {
 						error: { message: `'${field}' is required` },
 					});
 			});
 		});
-
-		it('removes XSS attack content from response', () => {
-			const { maliciousList, expectedList } = makeMaliciousList();
-			return supertest(app)
-				.post(`/api/lists`)
-				.send(maliciousList)
-				.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-				.expect(201)
-				.expect((res) => {
-					expect(res.body.list_name).to.eql(expectedList.list_name);
-				});
-		});
 	});
 
 	// Update list
 
-	describe(`PATCH /api/lists`, () => {
+	describe(`PATCH /api/to-do-lists`, () => {
+		const testLists = helpers.makeListsArray();
+		const testUsers = helpers.makeUsersArray();
+
+		beforeEach('insert lists', () => {
+			return db.into('nt_users').insert(testUsers);
+		});
 		context(`Given no lists`, () => {
-			it(`responds with 404 when list doesn't exist`, () => {
+			it(`responds with 404 when List doesn't exist`, () => {
 				return supertest(app)
-					.delete(`/api/lists/123`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+					.delete(`/api/to-do-lists/123`)
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 					.expect(404, {
-						error: { message: `list doesn't exist` },
+						error: { message: `List doesn't exist` },
 					});
 			});
 		});
 
 		context(`Given there are lists in the database`, () => {
-			const testLists = makeListsArray();
+			const testLists = helpers.makeListsArray();
 
 			beforeEach('insert lists', () => {
 				return db.into('to_do_lists').insert(testLists);
@@ -295,13 +257,13 @@ describe('Lists Endpoints', function () {
 					...updateList,
 				};
 				return supertest(app)
-					.patch(`/api/lists/${idToUpdate}`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+					.patch(`/api/to-do-lists/${idToUpdate}`)
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 					.send(updateList)
 					.expect(204)
 					.then((res) => {
 						supertest(app)
-							.get(`/api/lists/${idToUpdate}`)
+							.get(`/api/to-do-lists/${idToUpdate}`)
 							.expect(expectedList);
 					});
 			});
@@ -309,8 +271,8 @@ describe('Lists Endpoints', function () {
 			it(`responds with 400 when no required fields supplied`, () => {
 				const idToUpdate = 2;
 				return supertest(app)
-					.patch(`/api/lists/${idToUpdate}`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+					.patch(`/api/to-do-lists/${idToUpdate}`)
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 					.send({ irrelevantField: 'foo' })
 					.expect(400, {
 						error: {

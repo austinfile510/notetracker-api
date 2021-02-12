@@ -48,6 +48,7 @@ function makeTasksArray() {
 			is_checked: false,
 			modified: '2021-01-17T23:20:18.000Z',
 			list_id: 1,
+			user_id: 2
 		},
 		{
 			id: 2,
@@ -57,6 +58,7 @@ function makeTasksArray() {
 			is_checked: false,
 			modified: '2021-01-17T23:20:18.000Z',
 			list_id: 2,
+			user_id: 2
 		},
 		{
 			id: 3,
@@ -66,6 +68,7 @@ function makeTasksArray() {
 			is_checked: true,
 			modified: '2021-01-17T23:20:18.000Z',
 			list_id: 3,
+			user_id: 2
 		},
 	];
 }
@@ -78,6 +81,7 @@ function makeMaliciousTask() {
 		is_checked: true,
 		modified: new Date().toISOString(),
 		list_id: 1,
+		user_id: 2,
 	};
 	const expectedTask = {
 		...maliciousTask,
@@ -96,17 +100,17 @@ function makeListsArray() {
 		{
 			id: 1,
 			list_name: 'Important',
-			user_id: 1,
+			user_id: 2,
 		},
 		{
 			id: 2,
 			list_name: 'Work',
-			user_id: 1,
+			user_id: 2,
 		},
 		{
 			id: 3,
 			list_name: 'Grocery List',
-			user_id: 1,
+			user_id: 2,
 		},
 	];
 }
@@ -154,12 +158,12 @@ function cleanTables(db) {
 			)
 			.then(() =>
 				Promise.all([
-					trx.raw(`ALTER SEQUENCE tasks_id_seq minvalue 0 START WITH 1`),
-					trx.raw(`ALTER SEQUENCE to_do_lists_id_seq minvalue 0 START WITH 1`),
 					trx.raw(`ALTER SEQUENCE nt_users_id_seq minvalue 0 START WITH 1`),
-					trx.raw(`SELECT setval('tasks_id_seq', 0)`),
-					trx.raw(`SELECT setval('to_do_lists_id_seq', 0)`),
+					trx.raw(`ALTER SEQUENCE to_do_lists_id_seq minvalue 0 START WITH 1`),
+					trx.raw(`ALTER SEQUENCE tasks_id_seq minvalue 0 START WITH 1`),
 					trx.raw(`SELECT setval('nt_users_id_seq', 0)`),
+					trx.raw(`SELECT setval('to_do_lists_id_seq', 0)`),
+					trx.raw(`SELECT setval('tasks_id_seq', 0)`),
 				])
 			)
 	);
