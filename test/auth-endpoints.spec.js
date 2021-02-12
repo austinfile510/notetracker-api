@@ -2,11 +2,12 @@ const knex = require('knex')
 const jwt = require('jsonwebtoken')
 const app = require('../src/app')
 const helpers = require('./test-helpers')
+const { expect } = require('chai')
 
 describe('Auth Endpoints', function() {
   let db
 
-  const { testUsers } = helpers.makeRecipesFixtures()
+  const { testUsers } = helpers.makeTestsFixtures()
   const testUser = testUsers[0]
 
   before('make knex instance', () => {
@@ -23,7 +24,7 @@ describe('Auth Endpoints', function() {
 
   afterEach('cleanup', () => helpers.cleanTables(db))
 
-  describe(`POST /api/auth/login`, () => {
+  describe.only(`POST /api/auth/login`, () => {
     beforeEach('insert users', () =>
       helpers.seedUsers(
         db,
@@ -56,7 +57,7 @@ describe('Auth Endpoints', function() {
       return supertest(app)
         .post('/api/auth/login')
         .send(userInvalidUser)
-        .expect(400, { error: `Incorrect user_name or password` })
+        .expect(400, { error: `Username not found.` })
     })
 
     it(`responds 400 'invalid user_name or password' when bad password`, () => {
@@ -64,7 +65,7 @@ describe('Auth Endpoints', function() {
       return supertest(app)
         .post('/api/auth/login')
         .send(userInvalidPass)
-        .expect(400, { error: `Incorrect user_name or password` })
+        .expect(400, { error: `Incorrect user name or password` })
     })
 
     it(`responds 200 and JWT auth token using secret when valid credentials`, () => {

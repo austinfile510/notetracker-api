@@ -1,11 +1,11 @@
 const knex = require('knex');
-const { makeFoldersArray, makeMaliciousFolder } = require('./folders-fixtures');
+const { makeListsArray, makeMaliciousList } = require('./test-helpers');
 const app = require('../src/app');
 const { addColors } = require('winston/lib/winston/config');
 const supertest = require('supertest');
 const { expect } = require('chai');
 
-describe('Folders Endpoints', function () {
+describe('Lists Endpoints', function () {
 	let db;
 
 	before('make knex instance', () => {
@@ -18,54 +18,51 @@ describe('Folders Endpoints', function () {
 
 	after('disconnect from db', () => db.destroy());
 
-	before('clean the table', () =>
-		db.raw('TRUNCATE folders, notes RESTART IDENTITY CASCADE')
-	);
+	before('cleanup', () => helpers.cleanTables(db));
 
-	afterEach('cleanup', () =>
-		db.raw('TRUNCATE folders, notes RESTART IDENTITY CASCADE')
-	);
+	afterEach('cleanup', () => helpers.cleanTables(db));
+	
 
 	// Unauthorized Requests
 
 	describe(`Unauthorized requests`, () => {
-		const testFolders = makeFoldersArray();
+		const testLists = makeListsArray();
 
-		beforeEach('insert folders', () => {
-			return db.into('folders').insert(testFolders);
+		beforeEach('insert lists', () => {
+			return db.into('to_do_lists').insert(testLists);
 		});
 
-		it(`responds with 401 Unauthorized for GET /api/folders`, () => {
+		it(`responds with 401 Unauthorized for GET /api/lists`, () => {
 			return supertest(app)
-				.get('/api/folders')
+				.get('/api/lists')
 				.expect(401, { error: 'Unauthorized request' });
 		});
 
-		it(`responds with 401 Unauthorized for POST /api/folders`, () => {
+		it(`responds with 401 Unauthorized for POST /api/lists`, () => {
 			return supertest(app)
-				.post('/api/folders')
-				.send({ folder_name: 'Something' })
+				.post('/api/lists')
+				.send({ list_name: 'Something' })
 				.expect(401, { error: 'Unauthorized request' });
 		});
 
-		it(`responds with 401 Unauthorized for GET /api/folders/:id`, () => {
-			const secondFolder = testFolders[1];
+		it(`responds with 401 Unauthorized for GET /api/lists/:id`, () => {
+			const secondList = testLists[1];
 			return supertest(app)
-				.get(`/api/folders/${secondFolder.id}`)
+				.get(`/api/lists/${secondList.id}`)
 				.expect(401, { error: 'Unauthorized request' });
 		});
 
-		it(`responds with 401 Unauthorized for DELETE /api/folders/:id`, () => {
-			const aFolder = testFolders[1];
+		it(`responds with 401 Unauthorized for DELETE /api/lists/:id`, () => {
+			const alist = testlists[1];
 			return supertest(app)
-				.delete(`/api/folders/${aFolder.id}`)
+				.delete(`/api/lists/${alist.id}`)
 				.expect(401, { error: 'Unauthorized request' });
 		});
 
-		it(`responds with 401 Unauthorized for PATCH /api/folders/:id`, () => {
-			const aFolder = testFolders[1];
+		it(`responds with 401 Unauthorized for PATCH /api/lists/:id`, () => {
+			const alist = testlists[1];
 			return supertest(app)
-				.patch(`/api/folders/${aFolder.id}`)
+				.patch(`/api/lists/${alist.id}`)
 				.send({ title: 'updated-title' })
 				.expect(401, { error: 'Unauthorized request' });
 		});
@@ -73,180 +70,180 @@ describe('Folders Endpoints', function () {
 
 	// GET Requests
 
-	// GET all folders
-	describe(`GET /api/folders`, () => {
-		context(`Given no folders`, () => {
+	// GET all lists
+	describe(`GET /api/lists`, () => {
+		context(`Given no lists`, () => {
 			it(`responds with 200 and an empty list`, () => {
 				return supertest(app)
-					.get('/api/folders')
+					.get('/api/lists')
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(200, []);
 			});
 		});
 
-		context('Given there are folders in the database', () => {
-			const testFolders = makeFoldersArray();
+		context('Given there are lists in the database', () => {
+			const testLists = makeListsArray();
 
-			beforeEach('insert folders', () => {
-				return db.into('folders').insert(testFolders);
+			beforeEach('insert lists', () => {
+				return db.into('to_do_lists').insert(testLists);
 			});
 
-			it('responds with 200 and all the folders', () => {
+			it('responds with 200 and all the lists', () => {
 				return supertest(app)
-					.get('/api/folders')
+					.get('/api/lists')
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(200, testFolders);
+					.expect(200, testLists);
 			});
 		});
 
-		context(`Given an XSS attack folder`, () => {
-			const { maliciousFolder, expectedFolder } = makeMaliciousFolder();
+		context(`Given an XSS attack list`, () => {
+			const { maliciousList, expectedList } = makeMaliciousList();
 
-			beforeEach('insert malicious folder', () => {
-				return db.into('folders').insert([maliciousFolder]);
+			beforeEach('insert malicious list', () => {
+				return db.into('to_do_lists').insert([maliciousList]);
 			});
 
 			it('removes XSS attack content', () => {
 				return supertest(app)
-					.get(`/api/folders`)
+					.get(`/api/lists`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(200)
 					.expect((res) => {
-						expect(res.body[0].folder_name).to.eql(expectedFolder.folder_name);
+						expect(res.body[0].list_name).to.eql(expectedList.list_name);
 					});
 			});
 		});
 	});
 
-	// GET folder by id
+	// GET list by id
 
-	describe(`GET /api/folders/:folder_id`, () => {
-		context(`Given no folders`, () => {
+	describe(`GET /api/lists/:list_id`, () => {
+		context(`Given no lists`, () => {
 			it(`responds with 404`, () => {
-				const fakeFolderId = 123456;
+				const fakeListId = 123456;
 				return supertest(app)
-					.get(`/api/folders/${fakeFolderId}`)
+					.get(`/api/lists/${fakeListId}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(404, { error: { message: `Folder doesn't exist` } });
+					.expect(404, { error: { message: `list doesn't exist` } });
 			});
 		});
 
-		context(`Given there are folders in the database`, () => {
-			const testFolders = makeFoldersArray();
+		context(`Given there are lists in the database`, () => {
+			const testLists = makeListsArray();
 
-			beforeEach('insert folders', () => {
-				return db.into('folders').insert(testFolders);
+			beforeEach('insert lists', () => {
+				return db.into('to_do_lists').insert(testLists);
 			});
 
-			it(`responds with 200 and the specified folder`, () => {
-				const folderId = 2;
-				const expectedFolder = testFolders[folderId - 1];
+			it(`responds with 200 and the specified list`, () => {
+				const listId = 2;
+				const expectedList = testLists[listId - 1];
 				return supertest(app)
-					.get(`/api/folders/${folderId}`)
+					.get(`/api/lists/${listId}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(200, expectedFolder);
+					.expect(200, expectedList);
 			});
 		});
 
-		context(`Given an XSS attack folder`, () => {
-			const { maliciousFolder, expectedFolder } = makeMaliciousFolder();
+		context(`Given an XSS attack list`, () => {
+			const { maliciousList, expectedList } = makeMaliciousList();
 
-			beforeEach('insert malicious folder', () => {
-				return db.into('folders').insert([maliciousFolder]);
+			beforeEach('insert malicious list', () => {
+				return db.into('to_do_lists').insert([maliciousList]);
 			});
 
 			it('removes XSS attack content', () => {
 				return supertest(app)
-					.get(`/api/folders`)
+					.get(`/api/lists`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(200)
 					.expect((res) => {
-						expect(res.body[0].folder_name).to.eql(expectedFolder.folder_name);
+						expect(res.body[0].list_name).to.eql(expectedList.list_name);
 					});
 			});
 		});
 	});
 
-	// Delete Folder
+	// Delete list
 
-	describe(`DELETE /api/folders:id`, () => {
-		context(`Given no folders`, () => {
-			it(`responds with 404 when folder doesn't exist`, () => {
+	describe(`DELETE /api/lists:id`, () => {
+		context(`Given no lists`, () => {
+			it(`responds with 404 when list doesn't exist`, () => {
 				return supertest(app)
-					.delete(`/api/folders/123`)
+					.delete(`/api/lists/123`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(404, {
-						error: { message: `Folder doesn't exist` },
+						error: { message: `List doesn't exist` },
 					});
 			});
 		});
 
-		context(`Given there are folders in the database`, () => {
-			const testFolders = makeFoldersArray();
+		context(`Given there are lists in the database`, () => {
+			const testLists = makeListsArray();
 
-			beforeEach('insert folders', () => {
-				return db.into('folders').insert(testFolders);
+			beforeEach('insert lists', () => {
+				return db.into('to_do_lists').insert(testLists);
 			});
 
-			it(`removes the folder by ID from the database`, () => {
+			it(`removes the list by ID from the database`, () => {
 				const idToRemove = 2;
-				const expectedFolder = testFolders.filter((fr) => fr.id !== idToRemove);
+				const expectedList = testLists.filter((fr) => fr.id !== idToRemove);
 				return supertest(app)
-					.delete(`/api/folders/${idToRemove}`)
+					.delete(`/api/lists/${idToRemove}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(204)
 					.then(() =>
 						supertest(app)
-							.get(`/api/folders`)
+							.get(`/api/lists`)
 							.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-							.expect(expectedFolder)
+							.expect(expectedList)
 					);
 			});
 		});
 	});
 
-	// Insert Folder
+	// Insert list
 
-	describe(`POST /api/folders`, () => {
-		const testFolders = makeFoldersArray();
-		beforeEach('insert folders', () => {
-			// return db.into('folders').insert(testFolders);
+	describe(`POST /api/lists`, () => {
+		const testLists = makeListsArray();
+		beforeEach('insert lists', () => {
+			// return db.into('to_do_lists').insert(testLists);
 		});
 
-		it(`adds a new folder to the database`, () => {
-			const newFolder = {
-				folder_name: 'test-name',
+		it(`adds a new list to the database`, () => {
+			const newList = {
+				list_name: 'test-name',
 			};
 			return supertest(app)
-				.post(`/api/folders`)
-				.send(newFolder)
+				.post(`/api/lists`)
+				.send(newList)
 				.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 				.expect(201)
 				.expect((res) => {
-					expect(res.body.folder_name).to.eql(newFolder.folder_name);
-					expect(res.headers.location).to.eql(`/api/folders/${res.body.id}`);
+					expect(res.body.list_name).to.eql(newList.list_name);
+					expect(res.headers.location).to.eql(`/api/lists/${res.body.id}`);
 				})
 				.then((res) =>
 					supertest(app)
-						.get(`/api/folders/${res.body.id}`)
+						.get(`/api/lists/${res.body.id}`)
 						.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 						.expect(res.body)
 				);
 		});
 
-		const requiredFields = ['folder_name'];
+		const requiredFields = ['list_name'];
 
 		requiredFields.forEach((field) => {
-			const newFolder = {
-				folder_name: 'test-name',
+			const newList = {
+				list_name: 'test-name',
 			};
 
 			it(`responds with 400 missing '${field}' if not supplied`, () => {
-				delete newFolder[field];
+				delete newList[field];
 
 				return supertest(app)
-					.post(`/api/folders`)
-					.send(newFolder)
+					.post(`/api/lists`)
+					.send(newList)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(400, {
 						error: { message: `'${field}' is required` },
@@ -255,69 +252,69 @@ describe('Folders Endpoints', function () {
 		});
 
 		it('removes XSS attack content from response', () => {
-			const { maliciousFolder, expectedFolder } = makeMaliciousFolder();
+			const { maliciousList, expectedList } = makeMaliciousList();
 			return supertest(app)
-				.post(`/api/folders`)
-				.send(maliciousFolder)
+				.post(`/api/lists`)
+				.send(maliciousList)
 				.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 				.expect(201)
 				.expect((res) => {
-					expect(res.body.folder_name).to.eql(expectedFolder.folder_name);
+					expect(res.body.list_name).to.eql(expectedList.list_name);
 				});
 		});
 	});
 
-	// Update Folder
+	// Update list
 
-	describe(`PATCH /api/folders`, () => {
-		context(`Given no folders`, () => {
-			it(`responds with 404 when folder doesn't exist`, () => {
+	describe(`PATCH /api/lists`, () => {
+		context(`Given no lists`, () => {
+			it(`responds with 404 when list doesn't exist`, () => {
 				return supertest(app)
-					.delete(`/api/folders/123`)
+					.delete(`/api/lists/123`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(404, {
-						error: { message: `Folder doesn't exist` },
+						error: { message: `list doesn't exist` },
 					});
 			});
 		});
 
-		context(`Given there are folders in the database`, () => {
-			const testFolders = makeFoldersArray();
+		context(`Given there are lists in the database`, () => {
+			const testLists = makeListsArray();
 
-			beforeEach('insert folders', () => {
-				return db.into('folders').insert(testFolders);
+			beforeEach('insert lists', () => {
+				return db.into('to_do_lists').insert(testLists);
 			});
 
-			it('responds with 204 and updates the folder', () => {
+			it('responds with 204 and updates the list', () => {
 				const idToUpdate = 2;
-				const updateFolder = {
-					folder_name: 'updated folder name',
+				const updateList = {
+					list_name: 'updated list name',
 				};
-				const expectedFolder = {
-					...testFolders[idToUpdate - 1],
-					...updateFolder,
+				const expectedList = {
+					...testLists[idToUpdate - 1],
+					...updateList,
 				};
 				return supertest(app)
-					.patch(`/api/folders/${idToUpdate}`)
+					.patch(`/api/lists/${idToUpdate}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.send(updateFolder)
+					.send(updateList)
 					.expect(204)
 					.then((res) => {
 						supertest(app)
-							.get(`/api/folders/${idToUpdate}`)
-							.expect(expectedFolder);
+							.get(`/api/lists/${idToUpdate}`)
+							.expect(expectedList);
 					});
 			});
 
 			it(`responds with 400 when no required fields supplied`, () => {
 				const idToUpdate = 2;
 				return supertest(app)
-					.patch(`/api/folders/${idToUpdate}`)
+					.patch(`/api/lists/${idToUpdate}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.send({ irrelevantField: 'foo' })
 					.expect(400, {
 						error: {
-							message: `Request body must content 'folder_name'`,
+							message: `Request body must content 'list_name'`,
 						},
 					});
 			});

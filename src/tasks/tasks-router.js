@@ -29,8 +29,8 @@ tasksRouter
 			.catch(next);
 	})
 	.post(jsonParser, (req, res, next) => {
-		const { title, content, folder_id, modified } = req.body;
-		const newTask = { title, content, folder_id };
+		const { title, content, task_id, modified } = req.body;
+		const newTask = { title, content, task_id };
 
 		for (const [key, value] of Object.entries(newTask)) {
 			if (!value) {
@@ -44,7 +44,7 @@ tasksRouter
 		newTask.title = title;
 		newTask.content = content;
 		newTask.folder_id = folder_id;
-		// newtask.modified = modified;
+		// newTask.modified = modified;
 		const knexInstance = req.app.get('db');
 
 		TasksService.insertTask(knexInstance, newTask)
@@ -58,7 +58,7 @@ tasksRouter
 			.catch(next);
 	});
 
-// task ID Route
+// Task ID Route
 
 tasksRouter
 	.route('/:task_id')

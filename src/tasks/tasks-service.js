@@ -22,4 +22,4 @@ const TasksService = {
     }
 };
 
-module.exports = tasksService;
+module.exports = TasksService;

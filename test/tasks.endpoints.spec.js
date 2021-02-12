@@ -1,12 +1,15 @@
 const knex = require('knex');
-const { makeNotesArray, makeMaliciousNote } = require('./notes-fixtures');
-const { makeFoldersArray } = require('./folders-fixtures');
+const {
+	makeTasksArray,
+	makeMaliciousTask,
+	makeListsArray,
+} = require('./test-helpers');
 const app = require('../src/app');
-const { addColors } = require('winston/lib/winston/config');
+const helpers = require('./test-helpers');
 const supertest = require('supertest');
 const { expect } = require('chai');
 
-describe('Notes Endpoints', function () {
+describe('tasks Endpoints', function () {
 	let db;
 
 	before('make knex instance', () => {
@@ -19,259 +22,160 @@ describe('Notes Endpoints', function () {
 
 	after('disconnect from db', () => db.destroy());
 
-	before('clean the table', () =>
-		db.raw('TRUNCATE folders, notes RESTART IDENTITY CASCADE')
-	);
+	before('cleanup', () => helpers.cleanTables(db));
 
-	afterEach('cleanup', () =>
-		db.raw('TRUNCATE folders, notes RESTART IDENTITY CASCADE')
-	);
-
-	// Unauthorized Requests
-
-	describe(`Unauthorized requests`, () => {
-		const testNotes = makeNotesArray();
-		const testFolders = makeFoldersArray();
-
-		beforeEach('insert notes', () => {
-			return db
-				.into('folders')
-				.insert(testFolders)
-				.then(() => {
-					return db.into('notes').insert(testNotes);
-				});
-		});
-
-		it(`responds with 401 Unauthorized for GET /api/notes`, () => {
-			return supertest(app)
-				.get('/api/notes')
-				.expect(401, { error: 'Unauthorized request' });
-		});
-
-		it(`responds with 401 Unauthorized for POST /api/notes`, () => {
-			return supertest(app)
-				.post('/api/notes')
-				.send({
-					title: 'Something',
-					content: 'Test new Note content',
-					note_id: 1,
-				})
-				.expect(401, { error: 'Unauthorized request' });
-		});
-
-		it(`responds with 401 Unauthorized for GET /api/notes/:id`, () => {
-			const secondNote = testNotes[1];
-			return supertest(app)
-				.get(`/api/notes/${secondNote.id}`)
-				.expect(401, { error: 'Unauthorized request' });
-		});
-
-		it(`responds with 401 Unauthorized for DELETE /api/notes/:id`, () => {
-			const aNote = testNotes[1];
-			return supertest(app)
-				.delete(`/api/notes/${aNote.id}`)
-				.expect(401, { error: 'Unauthorized request' });
-		});
-
-		it(`responds with 401 Unauthorized for PATCH /api/notes/:id`, () => {
-			const aNote = testNotes[1];
-			return supertest(app)
-				.patch(`/api/notes/${aNote.id}`)
-				.send({ title: 'updated-title' })
-				.expect(401, { error: 'Unauthorized request' });
-		});
-	});
+	afterEach('cleanup', () => helpers.cleanTables(db));
 
 	// GET Requests
 
-	// GET all Notes
-	describe(`GET /api/notes`, () => {
-		context(`Given no notes`, () => {
+	// GET all tasks
+	describe(`GET /api/tasks`, () => {
+		const testUsers = helpers.makeUsersArray();
+
+		beforeEach('insert users', () => {
+			return db.into('nt_users').insert(testUsers);
+		});
+		context(`Given no tasks`, () => {
 			it(`responds with 200 and an empty list`, () => {
 				return supertest(app)
-					.get('/api/notes')
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+					.get('/api/tasks')
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
 					.expect(200, []);
 			});
 		});
 
-		context('Given there are notes in the database', () => {
-			const testNotes = makeNotesArray();
-			const testFolders = makeFoldersArray();
+		context('Given there are tasks in the database', () => {
+			const testTasks = helpers.makeTasksArray();
+			const testLists = helpers.makeListsArray();
+			const testUsers = helpers.makeUsersArray();
 
-			beforeEach('insert notes', () => {
+			beforeEach('insert users', () => {
+				return db.into('nt_users').insert(testUsers);
+			});
+
+			beforeEach('insert tasks', () => {
 				return db
-					.into('folders')
-					.insert(testFolders)
+					.into('to_do_lists')
+					.insert(testLists)
 					.then(() => {
-						return db.into('notes').insert(testNotes);
+						return db.into('tasks').insert(testTasks);
 					});
 			});
 
-			it('responds with 200 and all the notes', () => {
+			it('responds with 200 and all the tasks', () => {
 				return supertest(app)
-					.get('/api/notes')
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(200, testNotes);
-			});
-		});
-
-		context(`Given an XSS attack note`, () => {
-			const testFolders = makeFoldersArray();
-			const { maliciousNote, expectedNote } = makeMaliciousNote();
-
-			beforeEach('insert malicious note', () => {
-				return db
-					.into('folders')
-					.insert(testFolders)
-					.then(() => {
-						return db.into('notes').insert([maliciousNote]);
-					});
-			});
-
-			it('removes XSS attack content', () => {
-				return supertest(app)
-					.get(`/api/notes`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(200)
-					.expect((res) => {
-						expect(res.body[0].title).to.eql(expectedNote.title);
-						expect(res.body[0].content).to.eql(expectedNote.content);
-					});
+					.get('/api/tasks')
+					.set('Authorization', helpers.makeAuthHeader(testUsers[1]))
+					.expect(200, testTasks);
 			});
 		});
 	});
 
-	// GET Note by id
+	// GET task by id
 
-	describe(`GET /api/notes/:note_id`, () => {
-		context(`Given no notes`, () => {
+	describe(`GET /api/tasks/:task_id`, () => {
+		context(`Given no tasks`, () => {
 			it(`responds with 404`, () => {
-				const fakeNoteId = 123456;
+				const fakeTaskId = 123456;
 				return supertest(app)
-					.get(`/api/notes/${fakeNoteId}`)
+					.get(`/api/tasks/${fakeTaskId}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(404, { error: { message: `Note doesn't exist` } });
+					.expect(404, { error: { message: `task doesn't exist` } });
 			});
 		});
 
-		context(`Given there are notes in the database`, () => {
-			const testFolders = makeFoldersArray();
-			const testNotes = makeNotesArray();
+		context(`Given there are tasks in the database`, () => {
+			const testLists = makeListsArray();
+			const testTasks = makeTasksArray();
 
-			beforeEach('insert notes', () => {
+			beforeEach('insert tasks', () => {
 				return db
-					.into('folders')
-					.insert(testFolders)
+					.into('to_do_lists')
+					.insert(testLists)
 					.then(() => {
-						return db.into('notes').insert(testNotes);
+						return db.into('tasks').insert(testTasks);
 					});
 			});
 
-			it(`responds with 200 and the specified Note`, () => {
-				const noteId = 2;
-				const expectedNote = testNotes[noteId - 1];
+			it(`responds with 200 and the specified task`, () => {
+				const taskId = 2;
+				const expectedTask = testTasks[taskId - 1];
 				return supertest(app)
-					.get(`/api/notes/${noteId}`)
+					.get(`/api/tasks/${taskId}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(200, expectedNote);
-			});
-		});
-
-		context(`Given an XSS attack note`, () => {
-			const testFolders = makeFoldersArray();
-			const { maliciousNote, expectedNote } = makeMaliciousNote();
-
-			beforeEach('insert malicious note', () => {
-				return db
-					.into('folders')
-					.insert(testFolders)
-					.then(() => {
-						return db.into('notes').insert([maliciousNote]);
-					});
-			});
-
-			it('removes XSS attack content', () => {
-				return supertest(app)
-					.get(`/api/notes`)
-					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.expect(200)
-					.expect((res) => {
-						expect(res.body[0].title).to.eql(expectedNote.title);
-						expect(res.body[0].content).to.eql(expectedNote.content);
-					});
+					.expect(200, expectedTask);
 			});
 		});
 	});
 
-	// Delete Note
+	// Delete task
 
-	describe(`DELETE /api/notes:id`, () => {
-		context(`Given no notes`, () => {
-			it(`responds with 404 when note doesn't exist`, () => {
+	describe(`DELETE /api/tasks:id`, () => {
+		context(`Given no tasks`, () => {
+			it(`responds with 404 when task doesn't exist`, () => {
 				return supertest(app)
-					.delete(`/api/notes/123`)
+					.delete(`/api/tasks/123`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(404, {
-						error: { message: `Note doesn't exist` },
+						error: { message: `task doesn't exist` },
 					});
 			});
 		});
 
-		context(`Given there are notes in the database`, () => {
-			const testFolders = makeFoldersArray();
-			const testNotes = makeNotesArray();
+		context(`Given there are tasks in the database`, () => {
+			const testLists = makeListsArray();
+			const testTasks = makeTasksArray();
 
-			beforeEach('insert notes', () => {
+			beforeEach('insert tasks', () => {
 				return db
-					.into('folders')
-					.insert(testFolders)
+					.into('to_do_lists')
+					.insert(testLists)
 					.then(() => {
-						return db.into('notes').insert(testNotes);
+						return db.into('tasks').insert(testTasks);
 					});
 			});
 
-			it(`removes the note by ID from the database`, () => {
+			it(`removes the task by ID from the database`, () => {
 				const idToRemove = 2;
-				const expectedNote = testNotes.filter((fr) => fr.id !== idToRemove);
+				const expectedTask = testTasks.filter((fr) => fr.id !== idToRemove);
 				return supertest(app)
-					.delete(`/api/notes/${idToRemove}`)
+					.delete(`/api/tasks/${idToRemove}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(204)
 					.then(() =>
 						supertest(app)
-							.get(`/api/notes`)
+							.get(`/api/tasks`)
 							.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-							.expect(expectedNote)
+							.expect(expectedTask)
 					);
 			});
 		});
 	});
 
-	// Insert Note
+	// Insert task
 
-	describe(`POST /api/notes`, () => {
-		const testFolders = makeFoldersArray();
-		beforeEach('insert folders', () => {
-			return db.into('folders').insert(testFolders);
+	describe(`POST /api/tasks`, () => {
+		const testLists = makeListsArray();
+		beforeEach('insert lists', () => {
+			return db.into('to_do_lists').insert(testLists);
 		});
 
-		it(`adds a new note to the database`, () => {
-			const newNote = {
+		it(`adds a new task to the database`, () => {
+			const newTask = {
 				title: 'Something',
-				content: 'Test new Note content',
-				folder_id: 1,
+				content: 'Test new task content',
+				list_id: 1,
 			};
 			return supertest(app)
-				.post(`/api/notes`)
-				.send(newNote)
+				.post(`/api/tasks`)
+				.send(newTask)
 				.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 				.expect(201)
 				.expect((res) => {
-					expect(res.body.title).to.eql(newNote.title);
-					expect(res.body.content).to.eql(newNote.content);
-					expect(res.body.folder_id).to.eql(newNote.folder_id);
-					expect(res.headers.location).to.eql(`/api/notes/${res.body.id}`);
+					expect(res.body.title).to.eql(newTask.title);
+					expect(res.body.content).to.eql(newTask.content);
+					expect(res.body.list_id).to.eql(newTask.list_id);
+					expect(res.headers.location).to.eql(`/api/tasks/${res.body.id}`);
 					const expected = new Intl.DateTimeFormat('en-US').format(new Date());
 					const actual = new Intl.DateTimeFormat('en-US').format(
 						new Date(res.body.modified)
@@ -280,27 +184,28 @@ describe('Notes Endpoints', function () {
 				})
 				.then((res) =>
 					supertest(app)
-						.get(`/api/notes/${res.body.id}`)
+						.get(`/api/tasks/${res.body.id}`)
 						.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 						.expect(res.body)
 				);
 		});
 
-		const requiredFields = ['title', 'content', 'folder_id'];
+		const requiredFields = ['title', 'content', 'list_id'];
 
 		requiredFields.forEach((field) => {
-			const newNote = {
+			const newTask = {
 				title: 'test-name',
 				content: 'Add new content',
-				folder_id: 1,
+				list_id: 1,
+				user_id: 1,
 			};
 
 			it(`responds with 400 missing '${field}' if not supplied`, () => {
-				delete newNote[field];
+				delete newTask[field];
 
 				return supertest(app)
-					.post(`/api/notes`)
-					.send(newNote)
+					.post(`/api/tasks`)
+					.send(newTask)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(400, {
 						error: { message: `'${field}' is required` },
@@ -309,106 +214,106 @@ describe('Notes Endpoints', function () {
 		});
 
 		it('removes XSS attack content from response', () => {
-			const { maliciousNote, expectedNote } = makeMaliciousNote();
+			const { maliciousTask, expectedTask } = makeMaliciousTask();
 			return supertest(app)
-				.post(`/api/notes`)
-				.send(maliciousNote)
+				.post(`/api/tasks`)
+				.send(malicioustask)
 				.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 				.expect(201)
 				.expect((res) => {
-					expect(res.body.title).to.eql(expectedNote.title);
-					expect(res.body.content).to.eql(expectedNote.content);
+					expect(res.body.title).to.eql(expectedtask.title);
+					expect(res.body.content).to.eql(expectedtask.content);
 				});
 		});
 	});
 
-	// Update Note
+	// Update task
 
-	describe(`PATCH /api/notes`, () => {
-		context(`Given no notes`, () => {
-			it(`responds with 404 when note doesn't exist`, () => {
+	describe(`PATCH /api/tasks`, () => {
+		context(`Given no tasks`, () => {
+			it(`responds with 404 when task doesn't exist`, () => {
 				return supertest(app)
-					.delete(`/api/notes/123`)
+					.delete(`/api/tasks/123`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.expect(404, {
-						error: { message: `Note doesn't exist` },
+						error: { message: `task doesn't exist` },
 					});
 			});
 		});
 
-		context(`Given there are notes in the database`, () => {
-			const testFolders = makeFoldersArray();
-			const testNotes = makeNotesArray();
+		context(`Given there are tasks in the database`, () => {
+			const testLists = makeListsArray();
+			const testTasks = makeTasksArray();
 
-			beforeEach('insert folders', () => {
+			beforeEach('insert lists', () => {
 				return db
-					.into('folders')
-					.insert(testFolders)
+					.into('to_do_lists')
+					.insert(testLists)
 					.then(() => {
-						return db.into('notes').insert(testNotes);
+						return db.into('tasks').insert(testTasks);
 					});
 			});
 
-			it('responds with 204 and updates the Note', () => {
+			it('responds with 204 and updates the task', () => {
 				const idToUpdate = 2;
-				const updateNote = {
+				const updateTask = {
 					title: 'updated-title',
-					content: 'Updated note',
-					folder_id: 1,
+					content: 'Updated task',
+					list_id: 1,
 				};
-				const expectedNote = {
-					...testNotes[idToUpdate - 1],
-					...updateNote,
+				const expectedTask = {
+					...testTasks[idToUpdate - 1],
+					...updateTask,
 				};
 				return supertest(app)
-					.patch(`/api/notes/${idToUpdate}`)
+					.patch(`/api/tasks/${idToUpdate}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-					.send(updateNote)
+					.send(updateTask)
 					.expect(204)
 					.then((res) => {
 						return supertest(app)
-							.get(`/api/notes/${idToUpdate}`)
+							.get(`/api/tasks/${idToUpdate}`)
 							.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-							.expect(expectedNote);
+							.expect(expectedTask);
 					});
 			});
 
 			it(`responds with 400 when no required fields supplied`, () => {
 				const idToUpdate = 2;
 				return supertest(app)
-					.patch(`/api/notes/${idToUpdate}`)
+					.patch(`/api/tasks/${idToUpdate}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.send({ irrelevantField: 'foo' })
 					.expect(400, {
 						error: {
-							message: `Request body must content either 'title', 'content' or 'folder_id'`,
+							message: `Request body must content either 'title', 'content' or 'list_id'`,
 						},
 					});
 			});
 
 			it(`responds with 204 when updating only a subset of fields`, () => {
 				const idToUpdate = 2;
-				const updateNote = {
-					title: 'updated note title',
+				const updatetask = {
+					title: 'updated task title',
 				};
-				const expectedNote = {
-					...testNotes[idToUpdate - 1],
-					...updateNote,
+				const expectedtask = {
+					...testtasks[idToUpdate - 1],
+					...updatetask,
 				};
 
 				return supertest(app)
-					.patch(`/api/notes/${idToUpdate}`)
+					.patch(`/api/tasks/${idToUpdate}`)
 					.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
 					.send({
-						...updateNote,
+						...updatetask,
 						fieldToIgnore: 'should not be in GET response',
 					})
 					.expect(204)
 					.then((res) =>
 						supertest(app)
-							.get(`/api/notes/${idToUpdate}`)
+							.get(`/api/tasks/${idToUpdate}`)
 							.set('Authorization', `Bearer ${process.env.API_TOKEN}`)
-							.expect(expectedNote)
+							.expect(expectedtask)
 					);
 			});
 		});

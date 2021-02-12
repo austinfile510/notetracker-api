@@ -8,6 +8,7 @@ const errorHandler = require('./error-handler');
 const authRouter = require('./auth/auth-router');
 const usersRouter = require('./users/users-router');
 const listsRouter = require('./to-do-lists/to-do-lists-router');
+const tasksRouter = require('./tasks/tasks-router');
 
 
 const app = express();
@@ -23,8 +24,8 @@ app.use(
 	})
 );
 
-app.use('/to-do-lists', listsRouter);
-
+app.use('/api/to-do-lists', listsRouter);
+app.use('/api/tasks', tasksRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 

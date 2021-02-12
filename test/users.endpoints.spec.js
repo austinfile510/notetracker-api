@@ -7,7 +7,7 @@ const { expect } = require('chai')
 describe('Users Endpoints', function() {
   let db
 
-  const { testUsers } = helpers.makeRecipesFixtures()
+  const { testUsers } = helpers.makeTestsFixtures()
   const testUser = testUsers[0]
 
   before('make knex instance', () => {
@@ -135,7 +135,7 @@ describe('Users Endpoints', function() {
         return supertest(app)
           .post('/api/users')
           .send(duplicateUser)
-          .expect(400, { error: `Username already taken` })
+          .expect(400, { error: `Username or email already taken` })
       })
     })
 
@@ -164,7 +164,7 @@ describe('Users Endpoints', function() {
           })
           .expect(res =>
             db
-              .from('rk_users')
+              .from('nt_users')
               .select('*')
               .where({ id: res.body.id })
               .first()
