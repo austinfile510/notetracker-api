@@ -64,7 +64,7 @@ function makeFoldersArray() {
 	];
 }
 
-function makeMaliciousFolder() {
+function makeMaliciousTask() {
 	const maliciousFolder = {
 		id: 911,
 		folder_name: 'Naughty naughty very naughty <script>alert("xss");</script>',
