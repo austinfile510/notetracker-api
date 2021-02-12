@@ -1,26 +1,32 @@
-# Express Boilerplate!
+# Note Tracker
 
-This is a boilerplate project used for starting new projects!
+An Express API by Austin File
+## Live App: 
+https://notetracker-client.vercel.app/
 
-## Set up
+## Description/Summary
+NoteTracker is a to-do list app built using React. This server provides back end functionality and user account creation through an Express API.
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+Users can create accounts and save as many to-do lists as they wish to keep track of different projects simultaneously.
 
-1. Clone this repository to your local machine `git clone https://github.com/austinfile510/express-boilerplate`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+You can start using the app by registering a new user account. Click "Register" at the top of the app's page and follow the instructions. After that, you'll be taken to the Login screen and you can begin creating to-do lists.
 
-## Scripts
+Users can add and edit tasks they add to each list, and both can be deleted at any time.
 
-Start the application `npm start`
+## Documentation
+This API runs at the following endpoints:
 
-Start nodemon for the application `npm run dev`
+/users - Used to POST new users to the database.
+/auth/login - Used to POST login requests
 
-Run the tests `npm test`
+/to-do-lists - GET request, retrieves all users' to do lists. Users can switch between them freely after login.
+/to-do-lists/:to-doId - GET, lists tasks from a specific to-do list. 
+/tasks GET all tasks from all lists
+/tasks/:taskId GET, POST, and DELETE a specific task. Tasks can be viewed in more detail, change from complete or incomplete, and be deleted by the user.
 
-## Deploying
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's main branch.
+/my-recipes - Gets the recipes for the currently logged in user.
+### Technology Used
+This project was bootstrapped with [Express](https://expressjs.com/). [JWT](https://jwt.io/) is used for user authentication. The database is hosted on [Heroku](https://www.heroku.com/).
+
+Additional Packages used: cors, dotenv, helmet, morgan, knex, winston, postgrator-cli, chai, mocha, nodemon
