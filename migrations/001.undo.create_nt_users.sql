@@ -1,1 +1,1 @@
-DROP TABLE rk_users;
+DROP TABLE IF EXISTS nt_users;

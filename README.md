@@ -1,4 +1,4 @@
-# Note Tracker
+# NoteTracker
 
 An Express API by Austin File
 ## Live App: 
