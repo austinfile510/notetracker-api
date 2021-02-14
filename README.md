@@ -20,7 +20,7 @@ This API runs at the following endpoints:
 
 /auth/login - Used to POST login requests
 
-/to-do-lists - GET, retrieves all users' to-do lists. Users can switch between the lists freely after login. By default, will render tasks from all lists on login.
+/to-do-lists - GET, retrieves all users' to-do lists. Users can search between the lists freely after login. By default, will render tasks from all lists on login.
 
 /to-do-lists/:list_id - GET, lists tasks from a specific to-do list. 
 
