@@ -16,6 +16,12 @@ You can start using the app by registering a new user account. Click "Register" 
 
 Users can add and edit tasks they add to each list, and both can be deleted at any time.
 
+If you'd like to test the app out before making an account, use the following credentials:
+
+Username: Thanks4AllTheFish
+
+Password: DouglasAdams42!
+
 ## Documentation
 
 This API runs at the following endpoints:
