@@ -17,11 +17,15 @@ Users can add and edit tasks they add to each list, and both can be deleted at a
 This API runs at the following endpoints:
 
 /users - Used to POST new users to the database.
+
 /auth/login - Used to POST login requests
 
 /to-do-lists - GET, retrieves all users' to-do lists. Users can search between the lists freely after login. By default, will render tasks from all lists on login.
+
 /to-do-lists/:list_id - GET, lists tasks from a specific to-do list. 
+
 /tasks GET all tasks from all lists. By default, will render tasks from all lists on login.
+
 /tasks/:task_id GET, POST, and DELETE a specific task. Tasks can be viewed in more detail, change from complete or incomplete, and be deleted by the user.
 
 
