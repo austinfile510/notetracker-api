@@ -33,7 +33,7 @@ tasksRouter
 			.catch(next);
 	})
 	.post(requireAuth, jsonParser, (req, res, next) => {
-		const { title, content, list_id, } = req.body;
+		const { title, content, list_id } = req.body;
 		const newTask = { title, content, list_id };
 
 		for (const [key, value] of Object.entries(newTask)) {
@@ -44,7 +44,7 @@ tasksRouter
 				});
 			}
 		}
-		
+
 		newTask.user_id = req.user.id;
 		newTask.is_checked = false;
 		const knexInstance = req.app.get('db');

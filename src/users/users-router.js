@@ -24,7 +24,9 @@ usersRouter.post('/', jsonBodyParser, (req, res, next) => {
 	UsersService.hasUserWithUserName(req.app.get('db'), user_name, email)
 		.then((hasUserWithUserName) => {
 			if (hasUserWithUserName)
-				return res.status(400).json({ error: `Username or email already taken` });
+				return res
+					.status(400)
+					.json({ error: `Username or email already taken` });
 
 			return UsersService.hashPassword(password).then((hashedPassword) => {
 				const newUser = {

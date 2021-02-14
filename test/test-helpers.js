@@ -48,7 +48,7 @@ function makeTasksArray() {
 			is_checked: false,
 			modified: '2021-01-17T23:20:18.000Z',
 			list_id: 1,
-			user_id: 2
+			user_id: 2,
 		},
 		{
 			id: 2,
@@ -58,7 +58,7 @@ function makeTasksArray() {
 			is_checked: false,
 			modified: '2021-01-17T23:20:18.000Z',
 			list_id: 2,
-			user_id: 2
+			user_id: 2,
 		},
 		{
 			id: 3,
@@ -68,7 +68,7 @@ function makeTasksArray() {
 			is_checked: true,
 			modified: '2021-01-17T23:20:18.000Z',
 			list_id: 3,
-			user_id: 2
+			user_id: 2,
 		},
 	];
 }
