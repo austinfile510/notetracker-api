@@ -397,3 +397,26 @@
 {"message":"select * from \"tasks\" where \"id\" = $1 limit $2 - invalid input syntax for type integer: \"undefined\"","level":"error"}
 {"message":"Task with id 24 created.","level":"info"}
 {"message":"Task with id 25 created.","level":"info"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"List with id 2 deleted.","level":"info"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"task with id 2 deleted.","level":"info"}
+{"message":"Task with id 1 created.","level":"info"}
+{"message":"title is required","level":"error"}
+{"message":"content is required","level":"error"}
+{"message":"list_id is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"List with id 2 deleted.","level":"info"}
+{"message":"List with id 1 created.","level":"info"}
+{"message":"list_name is required","level":"error"}
+{"message":"Invalid update without required fields","level":"error"}
+{"message":"List with id 42 created.","level":"info"}
+{"message":"Task with id 26 created.","level":"info"}
+{"message":"List with id 43 created.","level":"info"}

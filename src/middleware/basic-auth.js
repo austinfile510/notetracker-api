@@ -15,19 +15,25 @@ function requireAuth(req, res, next) {
 	);
 
 	if (!tokenUserName || !tokenPassword) {
-		return res.status(401).json({ error: 'Unauthorized request, login token not found' });
+		return res
+			.status(401)
+			.json({ error: 'Unauthorized request, login token not found' });
 	}
 
 	AuthService.getUserWithUserName(req.app.get('db'), tokenUserName)
 		.then((user) => {
 			if (!user) {
-				return res.status(401).json({ error: 'Unauthorized request, no user found' });
+				return res
+					.status(401)
+					.json({ error: 'Unauthorized request, no user found' });
 			}
 
 			return AuthService.comparePasswords(tokenPassword, user.password).then(
 				(passwordsMatch) => {
 					if (!passwordsMatch) {
-						return res.status(401).json({ error: 'Unauthorized request, passwords did not match' });
+						return res
+							.status(401)
+							.json({ error: 'Unauthorized request, passwords did not match' });
 					}
 
 					req.user = user;
