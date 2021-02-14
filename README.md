@@ -31,6 +31,6 @@ This API runs at the following endpoints:
 
 /my-recipes - Gets the recipes for the currently logged in user.
 ### Technology Used
-This project was created [Express](https://expressjs.com/), Node.Js, and PostgreSQL. [JWT](https://jwt.io/) is used for user authentication. The database is hosted on [Heroku](https://www.heroku.com/).
+This project was created using [Express](https://expressjs.com/), Node.Js, and PostgreSQL. [JWT](https://jwt.io/) is used for user authentication. The database is hosted on [Heroku](https://www.heroku.com/).
 
 Additional Packages used: cors, dotenv, helmet, morgan, knex, winston, postgrator-cli, chai, mocha, nodemon
